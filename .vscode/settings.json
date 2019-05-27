@@ -20,7 +20,8 @@
         "wmj_delog.h": "c",
         "wmj_types.h": "c",
         "stdio.h": "c",
-        "stdarg.h": "c"
+        "stdarg.h": "c",
+        "paramdef.h": "c"
     }, // 因为有clang的补全，所以关掉
     "editor.glyphMargin": true,
 }
