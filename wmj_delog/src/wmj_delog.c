@@ -1,7 +1,28 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 #include "wmj_delog.h"
+
+static _I get_current_date(_s buf, _I size) {
+    time_t now;
+    struct tm *timenow;
+    time(&now);
+    timenow = localtime(&now);
+    return strftime(buf, size, "%Y-%m-%d", timenow);
+}
+
+static _I get_current_time(_s buf, _I size) {
+    time_t now;
+    struct tm *timenow;
+    time(&now);
+    timenow = localtime(&now);
+    return strftime(buf, size, "%Y-%m-%d %H:%M:%S", timenow);
+}
+
+
 #define _chkPOSINFO(type) ((type) & _POS_INFOBITS)
 
 static _I inited = 0;
@@ -20,9 +41,9 @@ static _s ms_msg = ms_buf;
     va_end(_backup);\
 } while(0)
 
-#define _init_delog(params) do{\
+#define _init_delog(params, dbgname, logname) do{\
     if (inited == 0) {\
-        va_copy_statement(params, s_init_delog,);\
+        va_copy_statement(params, s_init_delog, dbgname, logname);\
     }\
     _initMSG();\
 } while(0)
@@ -43,22 +64,122 @@ if(__tlen >= 0) {\
     va_copy_statement(params, fmt_str, ms_msg, msgsize, "[%s]<%s>(%d):", __file, __func, __line);\
 } while(0)
 
-static void s_init_delog(void) {
+#define _OPENFILE(fp, fname, fmode, endpos) do{\
+    if((fp = fopen(fname, fmode)) == 0) { \
+        perror("open file error"); \
+        goto endpos; \
+    }\
+} while(0)
+
+static FILE* fbug = 0;
+static FILE* flog = 0;
+static void destory_delog(void) {
+    if (inited == 0) {
+        goto _destory_delog_END;
+    }
+    inited = 0;
+    fclose(fbug);
+    fclose(flog);
+_destory_delog_END:
+    return;
+}
+static void s_init_delog(_s dbgname, _s logname) {
+    _I len;
+    _c buf[128];
+    if (inited) {
+        goto _s_init_delog_END;
+    }
     inited = 1;
+    atexit(destory_delog);
+    get_current_time(buf, 128);
+    if (dbgname == 0) {
+        _initMSG();
+        fmt_str(ms_msg, msgsize, "out/");
+        len = get_current_date(ms_msg, msgsize);
+        ms_msg += len;
+        msgsize -= len;
+        fmt_str(ms_msg, msgsize, ".dbg");
+        dbgname = ms_buf;
+    }
+    _OPENFILE(fbug, dbgname, "a+", _s_init_delog_END);
+    fprintf(fbug, "\n********** %s ***** %d(father %d) process run!\n", buf, getpid(), getppid());
+    if (logname == 0) {
+        _initMSG();
+        fmt_str(ms_msg, msgsize, "out/");
+        len = get_current_date(ms_msg, msgsize);
+        ms_msg += len;
+        msgsize -= len;
+        fmt_str(ms_msg, msgsize, ".log");
+        logname = ms_buf;
+    }
+    _OPENFILE(flog, logname, "a+", _s_init_delog_END);
+    fprintf(flog, "\n********** %s ***** %d(father %d) process run!\n", buf, getpid(), getppid());
     _pos_delog(_MAX_INFO_DELOG, "reg");
-    return ;
+
+_s_init_delog_END:
+    return;
 }
 
 void _wmj_delog(_I type, ...) {
     va_list params;
     va_start(params, type);
-    _init_delog(params);
+    if (type == _INIT_INFO_DELOG) {
+        _s dbgname, logname;
+        _getva_S(dbgname, params);
+        _getva_S(logname, params);
+        _init_delog(params, dbgname, logname);
+        goto _wmj_delog_END;
+    }
+    _init_delog(params, 0, 0);
+
     if (_chkPOSINFO(type)) {
         getPosInfo(params);
     }
+    // type >>= _SHIFT_INFOBITS;
 
 _wmj_delog_END:
     va_end(params);
     printf("test only: %s\n", ms_buf);
     return ;
+}
+
+#define fmt_one_hex(s, n, d) fmt_str(s, n, "%02x ", (_u8)(d))
+#define fmt_ext_hex(s, n) fmt_str(s, n, "XX ")
+#define fmt_continue(s, n, num) fmt_str(s, n, ".. (mode %d bytes not show)\n", num)
+#define fmt_new_line(s, n, addr) fmt_str(s, n, "\n0x%08x : ", (addr << 4))
+
+#define DEF_SHOW_MAX 256
+#define LINEBSIZE 4
+#define LINENUM _BITS_SIZE(LINEBSIZE)
+_I print_bin(_s s, _I size, _u8 *p, _I len) {
+    _I prefixnum = ((_u64)p) << 4;
+    _I suffixnum;
+    _I i = 0, j = 0, re = 0, n = size;
+    if (prefixnum) {
+        fmt_new_line(s, n, (_u32)(_i64)(p + i));
+    }
+    while (i < prefixnum) {
+        fmt_ext_hex(s, n);
+        i++;
+    }
+    while ((i < DEF_SHOW_MAX) && (len > 0)) {
+        if ((i & _BITS_MASK(LINEBSIZE)) == 0) {
+            fmt_new_line(s, n, (_u32)(_i64)(p + i));
+        }
+        fmt_one_hex(s, n, p[j]);
+        i++;
+        j++;
+        len--;
+    }
+    suffixnum = (LINENUM - i) << 4;
+    while (suffixnum) {
+        fmt_ext_hex(s, n);
+        suffixnum--;
+    }
+    if (len > 0) {
+        fmt_new_line(s, n, (_u32)(_i64)(p + i));
+        fmt_continue(s, n, len);
+    }
+    re = size - n;
+    return re;
 }

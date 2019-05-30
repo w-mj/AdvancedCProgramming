@@ -9,6 +9,8 @@ typedef signed short _i16;
 typedef unsigned short _u16;
 typedef signed int _i32;
 typedef unsigned int _u32;
+typedef signed long long _i64;
+typedef unsigned long long _u64;
 typedef _u32 _I;
 typedef _u8 _c;
 typedef _c* _s;
@@ -16,5 +18,14 @@ typedef _c* _s;
 #define _getva_T_(P, params, _T_) do {P = (_T_)va_arg(params, _T_); }while(0)
 #define _getva_S(s, params) _getva_T_(s, params, _s)
 #define _getva_I(s, params) _getva_T_(s, params, _I)
+
+
+#define _BITS_SIZE(n) (1 << (n))
+#define _BITS_MASK(n) (_BITS_SIZE(n) - 1)
+#define _BITSET(n) _BITS_SIZE(n)
+#define _get_bit(d, bit) ((d) & _BITSET(bit))
+#define _set_bit(d, bit) ((d) |= _BITSET(bit))
+#define _clr_bit(d, bit) ((d) &= (~(_BITSET(bit))))
+#define _chk_bit(d, bit) _get_bit(d, bit)
 
 #endif

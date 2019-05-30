@@ -3,7 +3,7 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/**"
             ],
             "defines": ["LOCAL_DEBUG"],
             "compilerPath": "/bin/gcc",
