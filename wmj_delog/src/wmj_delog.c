@@ -120,9 +120,43 @@ _s_init_delog_END:
     return;
 }
 
+static void out_info(_I mode) {
+    if (mode == _DBG_INFO_DELOG) {
+        if (fbug) {
+            fprintf(fbug, "%s\n", ms_buf);
+        }
+        printf("%s\n", ms_buf);
+        goto _out_info_END;
+    }
+
+_out_info_END:
+    return;
+}
+
+static void print_debug(va_list params) {
+    _I len;
+    _p tp;
+    _s fmt;
+    _s exp;
+    _getva_S(fmt, params);
+    _getva_S(exp, params);
+    fmt_str(ms_msg, msgsize, "| %s:", exp);
+    switch (fmt[0]) {
+        case 'a':
+            _getva_P(tp, params);
+            _getva_I(len, params);
+            fmt_str(ms_msg, msgsize, " (%d)", len);
+            msgsize -= print_bin(ms_msg, msgsize, tp, len);
+        break;
+    }
+_print_debug_END:
+    return ;
+}
+
 void _wmj_delog(_I type, ...) {
     va_list params;
     va_start(params, type);
+    printf("==%d\n", type);
     if (type == _INIT_INFO_DELOG) {
         _s dbgname, logname;
         _getva_S(dbgname, params);
@@ -135,7 +169,7 @@ void _wmj_delog(_I type, ...) {
     if (_chkPOSINFO(type)) {
         getPosInfo(params);
     }
-    type >>= 1;
+    // type >>= 1;
     switch(type) {
         case _DBG_INFO_DELOG:
             print_debug(params);
@@ -152,22 +186,27 @@ _wmj_delog_END:
 #define fmt_one_hex(s, n, d) fmt_str(s, n, "%02x ", (_u8)(d))
 #define fmt_ext_hex(s, n) fmt_str(s, n, "XX ")
 #define fmt_continue(s, n, num) fmt_str(s, n, ".. (mode %d bytes not show)\n", num)
-#define fmt_new_line(s, n, addr) fmt_str(s, n, "\n0x%08x : ", (addr << 4))
+#define fmt_new_line(s, n, addr) fmt_str(s, n, "\n0x%08x : ", _Lclr(addr, 4))
 
 #define DEF_SHOW_MAX 256
 #define LINEBSIZE 4
 #define LINENUM _BITS_SIZE(LINEBSIZE)
 _I print_bin(_s s, _I size, _u8 *p, _I len) {
-    _I prefixnum = ((_u64)p) << 4;
+    printf("in print bin\n");
+    printf("%s\n%d\n%s\n%d\nheihiehei\n", s, size, p, len);
+    _I prefixnum = _LNclr((_u64)p, 4);
     _I suffixnum;
     _I i = 0, j = 0, re = 0, n = size;
     if (prefixnum) {
         fmt_new_line(s, n, (_u32)(_i64)(p + i));
     }
+        printf("%x\n%s\n", prefixnum, ms_buf);
+
     while (i < prefixnum) {
         fmt_ext_hex(s, n);
         i++;
     }
+
     while ((i < DEF_SHOW_MAX) && (len > 0)) {
         if ((i & _BITS_MASK(LINEBSIZE)) == 0) {
             fmt_new_line(s, n, (_u32)(_i64)(p + i));
@@ -177,7 +216,7 @@ _I print_bin(_s s, _I size, _u8 *p, _I len) {
         j++;
         len--;
     }
-    suffixnum = (LINENUM - i) << 4;
+    suffixnum = _LNclr(LINENUM - i, 4);
     while (suffixnum) {
         fmt_ext_hex(s, n);
         suffixnum--;
@@ -187,5 +226,6 @@ _I print_bin(_s s, _I size, _u8 *p, _I len) {
         fmt_continue(s, n, len);
     }
     re = size - n;
+    printf("end print bin\n");
     return re;
 }
