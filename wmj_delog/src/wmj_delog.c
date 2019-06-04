@@ -135,11 +135,17 @@ void _wmj_delog(_I type, ...) {
     if (_chkPOSINFO(type)) {
         getPosInfo(params);
     }
-    // type >>= _SHIFT_INFOBITS;
+    type >>= 1;
+    switch(type) {
+        case _DBG_INFO_DELOG:
+            print_debug(params);
+            break;
+    }
 
 _wmj_delog_END:
     va_end(params);
-    printf("test only: %s\n", ms_buf);
+    out_info(type);
+    // printf("test only: %s\n", ms_buf);
     return ;
 }
 
