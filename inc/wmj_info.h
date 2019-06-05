@@ -11,12 +11,12 @@
 } while(0)
 
 #define mkstr(symbol) #symbol
-#define _error(exp, fmt, ...) do {\
-    if (exp) {\
-        __info("***Error occurs*** | %s", mkstr(exp));\
-        printf(fmt, __VA_ARGS__);\
-        putchar('\n');\
-    }\
-} while(0)
+// #define _error(exp, fmt, ...) do {\
+//     if (exp) {\
+//         __info("***Error occurs*** | %s", mkstr(exp));\
+//         printf(fmt, __VA_ARGS__);\
+//         putchar('\n');\
+//     }\
+// } while(0)
 
 #endif

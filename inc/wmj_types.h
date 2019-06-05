@@ -20,6 +20,9 @@ typedef _u8* _p;
 #define _getva_S(s, params) _getva_T_(s, params, _s)
 #define _getva_I(s, params) _getva_T_(s, params, _I)
 #define _getva_P(s, params) _getva_T_(s, params, _p)
+#define _getva_double(s, params) _getva_T_(s, params, double)
+#define _getva_I32(s, params) _getva_T_(s, params, _i32)
+
 
 
 #define _BITS_SIZE(n) (1 << (n))

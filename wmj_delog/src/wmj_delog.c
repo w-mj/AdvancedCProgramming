@@ -159,16 +159,60 @@ static void print_debug(va_list params) {
     _p tp;
     _s fmt;
     _s exp;
+    _s str;
+    _I I;
+    _i32 i;
+    double d;
     _getva_S(fmt, params);
     _getva_S(exp, params);
-    fmt_str(ms_msg, msgsize, "| %s:", exp);
+    if (fmt[0] == 'n') {
+        goto _print_debug_CON;
+    }
+    if (fmt[0] == 'e') {
+        fmt_str(ms_msg, msgsize, "*** error occured *** | %s | ", exp);
+        goto _print_debug_CON;
+    }
+    va_copy_statement(params, fmt_str, ms_msg, msgsize, " %s = ", exp);
+_print_debug_CON:
     switch (fmt[0]) {
+        case 'e':
+            fmt_vstr(ms_msg, msgsize, params);
+            break;
+        case 'n':
+            fmt_str(ms_msg, msgsize, " | (pos)");
+            break;
+        case 'x':
+            _getva_I(I, params);
+            fmt_str(ms_msg, msgsize, "0x%x", I);
+            break;
+        case 'f':
+            _getva_double(d, params);
+            fmt_str(ms_msg, msgsize, "%1f", d);
+            break;  
+        case 'd':
+            _getva_I32(i, params);
+            fmt_str(ms_msg, msgsize, "%d", i);
+            break;
+        case 'c':
+            _getva_I32(i, params);
+            fmt_str(ms_msg, msgsize, "%c", (_c)i);
+            break;
+        case 'p':
+            _getva_P(tp, params);
+            fmt_str(ms_msg, msgsize, "%p", tp);
+            break;
+        case 's':
+            _getva_S(str, params);
+            fmt_str(ms_msg, msgsize, "\"%s\"", str);
+            break;
         case 'a':
             _getva_P(tp, params);
             _getva_I(len, params);
             fmt_str(ms_msg, msgsize, " (%d)", len);
             msgsize -= print_bin(ms_msg, msgsize, tp, len);
         break;
+        default:
+            fprintf(stderr, "Unknown fmt %c\n", fmt[0]);
     }
 _print_debug_END:
     return ;

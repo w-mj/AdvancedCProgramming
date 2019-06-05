@@ -2,15 +2,16 @@
 #include "wmj_delog.h"
 
 _i32 main(_i32 argc, _s argv[]) {
-    // if (argc < 3) {
-    //     init_delog(0, 0);
-    // } else {
-    //     init_delog(argv[1], argv[2]);
-    // }
-    // init_delog("testa", "testb");
-    _sa(argv[0], 17);
-    _sa(argv[0], 3);
-    _sa(argv[0], 512);
-
+    _error(argc < 2, _main_END, "%s need 2 params!", argv[0]);
+    _bug(argc < 3);
+    _si(argc);
+    _sp(argc);
+    _sf((double) argc);
+    _sx(argc);
+    _pos();
+    _ss(argv[1]);
+    _sc(argv[2][0]);
+    _sa(argv[0], 20);
+_main_END:
     return 0;
 }
