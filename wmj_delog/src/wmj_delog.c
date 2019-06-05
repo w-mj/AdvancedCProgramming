@@ -49,12 +49,24 @@ static _s ms_msg = ms_buf;
 } while(0)
 
 #define fmt_str(s, n, ...) do {\
-_i32 __tlen = snprintf(s, n, __VA_ARGS__);\
-if(__tlen >= 0) {\
-    s += __tlen;\
-    n -= __tlen;\
-}\
+    _i32 __tlen = snprintf(s, n, __VA_ARGS__);\
+    if(__tlen >= 0) {\
+        s += __tlen;\
+        n -= __tlen;\
+    }\
 } while (0)
+
+#define fmt_vstr(s, n, params) do {\
+    _s __fmt; \
+    _i32 __tlen; \
+    _getva_S(__fmt, params); \
+    __tlen = vsnprintf(s, n, __fmt, params); \
+    if (__tlen >= 0) {\
+        s += __tlen;\
+        n -= __tlen;\
+    }\
+} while(0)
+
 #define getPosInfo(param) do {\
     _s __file, __func;\
     _I __line; \
@@ -77,6 +89,7 @@ static void destory_delog(void) {
     if (inited == 0) {
         goto _destory_delog_END;
     }
+    _reg();
     inited = 0;
     fclose(fbug);
     fclose(flog);
@@ -114,7 +127,8 @@ static void s_init_delog(_s dbgname, _s logname) {
     }
     _OPENFILE(flog, logname, "a+", _s_init_delog_END);
     fprintf(flog, "\n********** %s ***** %d(father %d) process run!\n", buf, getpid(), getppid());
-    _pos_delog(_MAX_INFO_DELOG, "reg");
+    _reg();
+    // _pos_delog(_MAX_INFO_DELOG, "reg");
 
 _s_init_delog_END:
     return;
@@ -124,6 +138,13 @@ static void out_info(_I mode) {
     if (mode == _DBG_INFO_DELOG) {
         if (fbug) {
             fprintf(fbug, "%s\n", ms_buf);
+        }
+        printf("%s\n", ms_buf);
+        goto _out_info_END;
+    }
+    if (mode == _LOG_INFO_DELOG) {
+        if (flog) {
+            fprintf(flog, "%s\n", ms_buf);
         }
         printf("%s\n", ms_buf);
         goto _out_info_END;
@@ -156,7 +177,7 @@ _print_debug_END:
 void _wmj_delog(_I type, ...) {
     va_list params;
     va_start(params, type);
-    printf("==%d\n", type);
+
     if (type == _INIT_INFO_DELOG) {
         _s dbgname, logname;
         _getva_S(dbgname, params);
@@ -169,10 +190,14 @@ void _wmj_delog(_I type, ...) {
     if (_chkPOSINFO(type)) {
         getPosInfo(params);
     }
-    // type >>= 1;
+    type = _Lclr(type, 1);
+
     switch(type) {
         case _DBG_INFO_DELOG:
             print_debug(params);
+            break;
+        case _LOG_INFO_DELOG:
+            fmt_vstr(ms_msg, msgsize, params);
             break;
     }
 
@@ -192,15 +217,15 @@ _wmj_delog_END:
 #define LINEBSIZE 4
 #define LINENUM _BITS_SIZE(LINEBSIZE)
 _I print_bin(_s s, _I size, _u8 *p, _I len) {
-    printf("in print bin\n");
-    printf("%s\n%d\n%s\n%d\nheihiehei\n", s, size, p, len);
+    //printf("in print bin\n");
+    //printf("%s\n%d\n%s\n%d\nheihiehei\n", s, size, p, len);
     _I prefixnum = _LNclr((_u64)p, 4);
     _I suffixnum;
     _I i = 0, j = 0, re = 0, n = size;
     if (prefixnum) {
         fmt_new_line(s, n, (_u32)(_i64)(p + i));
     }
-        printf("%x\n%s\n", prefixnum, ms_buf);
+        //printf("%x\n%s\n", prefixnum, ms_buf);
 
     while (i < prefixnum) {
         fmt_ext_hex(s, n);
@@ -226,6 +251,6 @@ _I print_bin(_s s, _I size, _u8 *p, _I len) {
         fmt_continue(s, n, len);
     }
     re = size - n;
-    printf("end print bin\n");
+    //printf("end print bin\n");
     return re;
 }

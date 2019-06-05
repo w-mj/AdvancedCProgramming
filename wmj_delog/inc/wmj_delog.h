@@ -8,7 +8,8 @@
 #define _NPOS_INFOBITS (~_POS_INFOBITS)
 enum {
     _INIT_INFO_DELOG = 0,
-    _DBG_INFO_DELOG,
+    _LOG_INFO_DELOG = 2,
+    _DBG_INFO_DELOG = 4,
     _MAX_INFO_DELOG,
 };
 #define _pos_delog(type, ...) _wmj_delog((type)|_POS_INFOBITS, __FILE__, __LINE__, __func__, __VA_ARGS__)
@@ -16,6 +17,9 @@ enum {
 // #define init_delog() do{_Npos_delog(_INIT_INFO_DELOG, 0);} while(0)
 #define init_delog(dbgname, logname) do{_Npos_delog(_INIT_INFO_DELOG, dbgname, logname);}while(0)
 #define _debug_info(expstr, m, ...) _pos_delog(_DBG_INFO_DELOG, m, expstr, __VA_ARGS__)
+#define _log_info(...) _Npos_delog(_LOG_INFO_DELOG, __VA_ARGS__)
+#define _reg() _log_info("[%s] run!", __func__)
+
 #define _sa(exp, len) _debug_info(mkstr(exp), "a", exp, len)
 
 void _wmj_delog(_I type, ...);
