@@ -81,7 +81,6 @@ void print_config(_CONFIG *cfg, FILE *f) {
     fprintf(f, "num.max: %d\n", cfg->num.max);
     fprintf(f, "num.min: %d\n", cfg->num.min);
     fprintf(f, "num.def: %d\n", cfg->num.def);
-
     return;
 }
 #include "lex.h"
@@ -92,11 +91,14 @@ static _I secID = wmj_null;
 
 #define SECNUM 2
 enum {
-    ENUM_num,
-    ENUM_str,
+    #define SECNAME_ENUM
+    #include "configDef.h"
     MAX_SECNAME
 };
-static const _c*(SECNAME[MAX_SECNAME]) = {"num", "str"};
+static const _c*(SECNAME[MAX_SECNAME]) = {
+    #define SECNAME_STRDEF
+    #include "configDef.h"
+};
 #define MNAMESIZE 1024
 static _c m_name[MNAMESIZE];
 static _I set_section(_CONFIG *pcfg, _s str, _I len) {
@@ -107,7 +109,7 @@ static _I set_section(_CONFIG *pcfg, _s str, _I len) {
         for (i = 0; i < MAX_SECNAME; i++) {
             if (strcmp(SECNAME[i], str + 1) == 0) {
                 secID = i;
-                printf("found %s section !\n", str + 1);
+                // printf("found %s section !\n", str + 1);
                 break;
             }
         }
@@ -116,7 +118,7 @@ static _I set_section(_CONFIG *pcfg, _s str, _I len) {
             re = wmj_null;
         }
     } else {
-        print_config(pcfg, stdout);
+        // print_config(pcfg, stdout);
         if (secfunc != 0) {
             re = secfunc(pcfg, sec_pm);
         }
@@ -133,30 +135,34 @@ static _I set_memberName(_CONFIG *pcfg, _s str, _I len) {
 }
 static _I set_memberInfo(_CONFIG *pcfg, _s str, _I len) {
     _I i, re = 0;
-    if (strcmp("str.name", m_name) == 0) {
-        strxcpy(pcfg->str.name, str, MAX_NAME_LEN);
-        goto _set_memberInfo_END;
-    }
-    if (strcmp("str.bufsize", m_name) == 0) {
-        pcfg->str.bufsize = atoi(str);
-        goto _set_memberInfo_END;
-    }
-    if (strcmp("num.name", m_name) == 0) {
-        strxcpy(pcfg->num.name, str, MAX_NAME_LEN);
-        goto _set_memberInfo_END;
-    }
-    if (strcmp("num.min", m_name) == 0) {
-        pcfg->num.min = atoi(str);
-        goto _set_memberInfo_END;
-    }
-    if (strcmp("num.max", m_name) == 0) {
-        pcfg->num.max = atoi(str);
-        goto _set_memberInfo_END;
-    }
-    if (strcmp("num.def", m_name) == 0) {
-        pcfg->num.def = atoi(str);
-        goto _set_memberInfo_END;
-    }
+    #define CMP_STRPARAMS
+    #include "configDef.h"
+    #define CMP_IPARAMS
+    #include "configDef.h"
+    // if (strcmp("str.name", m_name) == 0) {
+    //     strxcpy(pcfg->str.name, str, MAX_NAME_LEN);
+    //     goto _set_memberInfo_END;
+    // }
+    // if (strcmp("str.bufsize", m_name) == 0) {
+    //     pcfg->str.bufsize = atoi(str);
+    //     goto _set_memberInfo_END;
+    // }
+    // if (strcmp("num.name", m_name) == 0) {
+    //     strxcpy(pcfg->num.name, str, MAX_NAME_LEN);
+    //     goto _set_memberInfo_END;
+    // }
+    // if (strcmp("num.min", m_name) == 0) {
+    //     pcfg->num.min = atoi(str);
+    //     goto _set_memberInfo_END;
+    // }
+    // if (strcmp("num.max", m_name) == 0) {
+    //     pcfg->num.max = atoi(str);
+    //     goto _set_memberInfo_END;
+    // }
+    // if (strcmp("num.def", m_name) == 0) {
+    //     pcfg->num.def = atoi(str);
+    //     goto _set_memberInfo_END;
+    // }
     re = wmj_null;
 _set_memberInfo_END:
     return re;
@@ -316,7 +322,7 @@ _I load_config(_s infilename, _I is_init, _CONFIG *pcfg, pCFGFUNC pfunc, _p pm) 
             fprintf(stdout, "<%s> have error.\n", infilename);
             break;
         }
-        fprintf(stdout, "found: \"%s\" type %d\n", str, type);
+        // fprintf(stdout, "found: \"%s\" type %d\n", str, type);
         _swap(zero, str[len]);
         switch (status) {
             case _FINISH_STATUS:

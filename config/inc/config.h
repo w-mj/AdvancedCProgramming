@@ -17,11 +17,11 @@ typedef struct {
 typedef struct {
     _c name[MAX_NAME_LEN];
     _I bufsize;
-} _STRING_PARAM;
+} _STR_PARAM;
 
 typedef struct {
-    _STRING_PARAM str;
-    _NUM_PARAM num;
+    #define SECNAME_DEF
+    #include "configDef.h"
 } _CONFIG;
 
 typedef _I (*pCFGFUNC) (_CONFIG *pCfg, _p pm);
