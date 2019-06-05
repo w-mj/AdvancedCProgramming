@@ -105,6 +105,7 @@ static void s_init_delog(_s dbgname, _s logname) {
     inited = 1;
     atexit(destory_delog);
     get_current_time(buf, 128);
+#if DELOG_MODE < 2
     if (dbgname == 0) {
         _initMSG();
         fmt_str(ms_msg, msgsize, "out/");
@@ -116,6 +117,7 @@ static void s_init_delog(_s dbgname, _s logname) {
     }
     _OPENFILE(fbug, dbgname, "a+", _s_init_delog_END);
     fprintf(fbug, "\n********** %s ***** %d(father %d) process run!\n", buf, getpid(), getppid());
+#endif
     if (logname == 0) {
         _initMSG();
         fmt_str(ms_msg, msgsize, "out/");
@@ -136,17 +138,23 @@ _s_init_delog_END:
 
 static void out_info(_I mode) {
     if (mode == _DBG_INFO_DELOG) {
+#if DELOG_MODE < 2
         if (fbug) {
             fprintf(fbug, "%s\n", ms_buf);
         }
+#endif
+#if DELOG_MODE == 0
         printf("%s\n", ms_buf);
+#endif
         goto _out_info_END;
     }
     if (mode == _LOG_INFO_DELOG) {
         if (flog) {
             fprintf(flog, "%s\n", ms_buf);
         }
+#if DELOG_MODE == 0
         printf("%s\n", ms_buf);
+#endif
         goto _out_info_END;
     }
 
