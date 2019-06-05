@@ -76,12 +76,6 @@ static _s ms_msg = ms_buf;
     va_copy_statement(params, fmt_str, ms_msg, msgsize, "[%s]<%s>(%d):", __file, __func, __line);\
 } while(0)
 
-#define _OPENFILE(fp, fname, fmode, endpos) do{\
-    if((fp = fopen(fname, fmode)) == 0) { \
-        perror("open file error"); \
-        goto endpos; \
-    }\
-} while(0)
 
 static FILE* fbug = 0;
 static FILE* flog = 0;

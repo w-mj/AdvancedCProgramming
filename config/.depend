@@ -1,0 +1,4 @@
+obj/test_config_main.o: src/test_config_main.c inc/types.h inc/config.h \
+ inc/types.h inc/defines.h inc/defines.h
+obj/config.o: src/config.c inc/config.h inc/types.h inc/defines.h \
+ inc/defines.h inc/types.h inc/delog.h inc/info.h inc/lex.h

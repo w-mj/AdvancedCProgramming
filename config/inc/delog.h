@@ -22,8 +22,8 @@
 #endif
 
 // #include <stdarg.h>
-#include "wmj_types.h"
-#include "wmj_info.h"
+#include "types.h"
+#include "info.h"
 #define _POS_INFOBITS (_I)1
 #define _NPOS_INFOBITS (~_POS_INFOBITS)
 
