@@ -5,8 +5,23 @@
 #include "types.h"
 #include "defines.h"
 
+#define MAX_NAME_LEN 128
+
 typedef struct {
-    _I test;
+    _c name[MAX_NAME_LEN];
+    _i32 min;
+    _i32 max;
+    _i32 def;
+} _NUM_PARAM;
+
+typedef struct {
+    _c name[MAX_NAME_LEN];
+    _I bufsize;
+} _STRING_PARAM;
+
+typedef struct {
+    _STRING_PARAM str;
+    _NUM_PARAM num;
 } _CONFIG;
 
 typedef _I (*pCFGFUNC) (_CONFIG *pCfg, _p pm);

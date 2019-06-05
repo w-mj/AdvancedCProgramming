@@ -5,6 +5,19 @@
 #include "types.h"
 #include "delog.h"
 
+_I strxcpy(_s dst, _s src, _I n) {
+    _I i = 0;
+    if (n == 0)
+        return 0;
+    n--;
+    while (i < n && src[i]) {
+        dst[i] = src[i];
+        i++;
+    }
+    dst[i] = 0;
+    return i;
+}
+
 typedef struct {
     _I h;  // current cursor
     _I t;  // max size
@@ -62,13 +75,92 @@ static void init_config(_CONFIG *pcfg, _I is_init, _CONFIG *psrc) {
 
 void print_config(_CONFIG *cfg, FILE *f) {
     fprintf(f, "config list:\n");
-    fprintf(f, "test: %d\n", cfg->test);
+    fprintf(f, "str.name: %s\n", cfg->str.name);
+    fprintf(f, "str.bufsize: %d\n", cfg->str.bufsize);
+    fprintf(f, "num.name: %s\n", cfg->num.name);
+    fprintf(f, "num.max: %d\n", cfg->num.max);
+    fprintf(f, "num.min: %d\n", cfg->num.min);
+    fprintf(f, "num.def: %d\n", cfg->num.def);
+
     return;
 }
 #include "lex.h"
 
 static _I error_f;
 
+static _I secID = wmj_null;
+
+#define SECNUM 2
+enum {
+    ENUM_num,
+    ENUM_str,
+    MAX_SECNAME
+};
+static const _c*(SECNAME[MAX_SECNAME]) = {"num", "str"};
+#define MNAMESIZE 1024
+static _c m_name[MNAMESIZE];
+static _I set_section(_CONFIG *pcfg, _s str, _I len) {
+    _I i, re = 0;
+    _c zero = '\0';
+    if ((str) && (len > 2)) {
+        _swap(str[len - 1], zero);
+        for (i = 0; i < MAX_SECNAME; i++) {
+            if (strcmp(SECNAME[i], str + 1) == 0) {
+                secID = i;
+                printf("found %s section !\n", str + 1);
+                break;
+            }
+        }
+        _swap(str[len - 1], zero);
+        if (i >= MAX_SECNAME) {
+            re = wmj_null;
+        }
+    } else {
+        print_config(pcfg, stdout);
+        if (secfunc != 0) {
+            re = secfunc(pcfg, sec_pm);
+        }
+        secID = wmj_null;
+    }
+    return re;
+}
+static _I set_memberName(_CONFIG *pcfg, _s str, _I len) {
+    _I l, re = 0;
+    l = strxcpy(m_name, (_s)SECNAME[secID], MNAMESIZE);
+    l += strxcpy(m_name + l, ".", MNAMESIZE);
+    l += strxcpy(m_name + l, str, MNAMESIZE);
+    return re;
+}
+static _I set_memberInfo(_CONFIG *pcfg, _s str, _I len) {
+    _I i, re = 0;
+    if (strcmp("str.name", m_name) == 0) {
+        strxcpy(pcfg->str.name, str, MAX_NAME_LEN);
+        goto _set_memberInfo_END;
+    }
+    if (strcmp("str.bufsize", m_name) == 0) {
+        pcfg->str.bufsize = atoi(str);
+        goto _set_memberInfo_END;
+    }
+    if (strcmp("num.name", m_name) == 0) {
+        strxcpy(pcfg->num.name, str, MAX_NAME_LEN);
+        goto _set_memberInfo_END;
+    }
+    if (strcmp("num.min", m_name) == 0) {
+        pcfg->num.min = atoi(str);
+        goto _set_memberInfo_END;
+    }
+    if (strcmp("num.max", m_name) == 0) {
+        pcfg->num.max = atoi(str);
+        goto _set_memberInfo_END;
+    }
+    if (strcmp("num.def", m_name) == 0) {
+        pcfg->num.def = atoi(str);
+        goto _set_memberInfo_END;
+    }
+    re = wmj_null;
+_set_memberInfo_END:
+    return re;
+}
 enum {
     _WAIT_STATUS,
     _GETSEC_STATUS,
@@ -80,14 +172,89 @@ enum {
     _ERROR_STATUS,
     _MAX_STATUS
 };
-typedef _I (*pGRAMMERFUNC) (_CONFIG *pCfg, _s str, _I len, _I status);
+typedef _I (*pGRAMMERFUNC) (_CONFIG *pcfg, _s str, _I len, _I status);
 
-static _I grammar_comments(_CONFIG *pCfg, _s str, _I len, _I status) {return _FINISH_STATUS;}
-static _I grammar_split(_CONFIG *pCfg, _s str, _I len, _I status) {return _ERROR_STATUS;}
-static _I grammar_secend(_CONFIG *pCfg, _s str, _I len, _I status) {return _GETEND_STATUS;}
-static _I grammar_secname(_CONFIG *pCfg, _s str, _I len, _I status) {return _GETSEC_STATUS;}
-static _I grammar_symbol(_CONFIG *pCfg, _s str, _I len, _I status) {return _GETINFO_STATUS;}
-static _I grammar_str(_CONFIG *pCfg, _s str, _I len, _I status) {return _ERROR_STATUS;}
+static _I grammar_comments(_CONFIG *pcfg, _s str, _I len, _I status) {
+    _I re = _ERROR_STATUS;
+    if (status == _WAIT_STATUS) {
+        re = _FINISH_STATUS;
+    }
+    return re;
+}
+static _I grammar_split(_CONFIG *pcfg, _s str, _I len, _I status) {
+    _I re = _ERROR_STATUS;
+    if (secID == wmj_null) {
+        goto _grammar_split_END;
+    }
+    if (status == _GETSYMBOL_STATUS) {
+        re = _GETSPLIT_STATUS;
+    }
+_grammar_split_END:
+    return re;
+}
+static _I grammar_secend(_CONFIG *pcfg, _s str, _I len, _I status) {
+    _I re = _ERROR_STATUS;
+    if (secID == wmj_null) {
+        goto _grammer_secend_END;
+    }
+    if (status != _WAIT_STATUS) {
+        goto _grammer_secend_END;
+    }
+    if (set_section(pcfg, 0, 0) == wmj_null) {
+        goto _grammer_secend_END;
+    }
+    re = _GETEND_STATUS;
+_grammer_secend_END:
+    return re;
+}
+static _I grammar_secname(_CONFIG *pcfg, _s str, _I len, _I status) {
+    _I re = _ERROR_STATUS;
+    if (secID != wmj_null) {
+        goto _grammer_secname_END;
+    }
+    if (status != _WAIT_STATUS) {
+        goto _grammer_secname_END;
+    }
+    if (set_section(pcfg, str, len) == wmj_null) {
+        goto _grammer_secname_END;
+    }
+    re = _GETSEC_STATUS;
+_grammer_secname_END:
+    return re;
+}
+static _I grammar_symbol(_CONFIG *pcfg, _s str, _I len, _I status) {
+    _I re = _ERROR_STATUS;
+    if (secID == wmj_null) {
+        goto _grammar_symbol_END;
+    }
+    if (status == _WAIT_STATUS) {
+        if (set_memberName(pcfg, str, len) == wmj_null) {
+            goto _grammar_symbol_END;
+        }
+        re = _GETSYMBOL_STATUS;
+    } else if (status == _GETSPLIT_STATUS) {
+        if (set_memberInfo(pcfg, str, len) == wmj_null) {
+            goto _grammar_symbol_END;
+        }
+        re = _GETINFO_STATUS;
+    }
+_grammar_symbol_END:
+    return re;
+}
+static _I grammar_str(_CONFIG *pcfg, _s str, _I len, _I status) {
+    _I re = _ERROR_STATUS;
+    if (secID == wmj_null) {
+        goto _grammar_str_END;
+    }
+    if (status == _GETSPLIT_STATUS) {
+        if (set_memberInfo(pcfg, str, len) == wmj_null) {
+            goto _grammar_str_END;            
+        }
+        re = _GETINFO_STATUS;
+    }
+_grammar_str_END:
+    return re;
+}
 
 static pGRAMMERFUNC grammer_func[_MAX_LEX_MODE] = {
     grammar_comments, 
@@ -123,7 +290,7 @@ _analyse_lex_END:
 }
 
 
-_I load_config(_s infilename, _I is_init, _CONFIG *pCfg, pCFGFUNC pfunc, _p pm) {
+_I load_config(_s infilename, _I is_init, _CONFIG *pcfg, pCFGFUNC pfunc, _p pm) {
     _I re = 0;
     _s str;
     _I len, type, status;
@@ -133,7 +300,7 @@ _I load_config(_s infilename, _I is_init, _CONFIG *pCfg, pCFGFUNC pfunc, _p pm) 
     _CONFIG ptCfg[1];
     secfunc = pfunc;
     sec_pm = pm;
-    init_config(ptCfg, is_init, pCfg);
+    init_config(ptCfg, is_init, pcfg);
     p = load_file(infilename);
     _error(p == NULL, _load_config_END, "load file error");
     status = _WAIT_STATUS;
@@ -145,11 +312,11 @@ _I load_config(_s infilename, _I is_init, _CONFIG *pCfg, pCFGFUNC pfunc, _p pm) 
             break;
         }
         _swap(zero, str[len]);
-        if ((status = grammer_func[status](ptCfg, str, len, status)) == _ERROR_STATUS) {
+        if ((status = grammer_func[type](ptCfg, str, len, status)) == _ERROR_STATUS) {
             fprintf(stdout, "<%s> have error.\n", infilename);
             break;
         }
-        fprintf(stdout, "fount: \"%s\" type %d\n", str, type);
+        fprintf(stdout, "found: \"%s\" type %d\n", str, type);
         _swap(zero, str[len]);
         switch (status) {
             case _FINISH_STATUS:
@@ -161,7 +328,7 @@ _I load_config(_s infilename, _I is_init, _CONFIG *pCfg, pCFGFUNC pfunc, _p pm) 
         }
     }
     // printf("%s\n", p->buf);
-    memcpy(pCfg, ptCfg, sizeof(_CONFIG));
+    memcpy(pcfg, ptCfg, sizeof(_CONFIG));
     re = wmj_null;
 _load_config_END:
     free_strbuf(&p);

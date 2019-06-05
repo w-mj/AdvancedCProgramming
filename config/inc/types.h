@@ -14,7 +14,7 @@ typedef unsigned long long _u64;
 typedef _u32 _I;
 typedef _u8 _c;
 typedef _c* _s;
-typedef _u8* _p;
+typedef void* _p;
 
 #define _getva_T_(P, params, _T_) do {P = (_T_)va_arg(params, _T_); }while(0)
 #define _getva_S(s, params) _getva_T_(s, params, _s)
