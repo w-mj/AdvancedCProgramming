@@ -75,12 +75,10 @@ static void init_config(_CONFIG *pcfg, _I is_init, _CONFIG *psrc) {
 
 void print_config(_CONFIG *cfg, FILE *f) {
     fprintf(f, "config list:\n");
-    fprintf(f, "str.name: %s\n", cfg->str.name);
-    fprintf(f, "str.bufsize: %d\n", cfg->str.bufsize);
-    fprintf(f, "num.name: %s\n", cfg->num.name);
-    fprintf(f, "num.max: %d\n", cfg->num.max);
-    fprintf(f, "num.min: %d\n", cfg->num.min);
-    fprintf(f, "num.def: %d\n", cfg->num.def);
+    #define PRINT_IPARAMS
+    #include "configbase.h"
+    #define PRINT_STRPARAMS
+    #include "configbase.h"
     return;
 }
 #include "lex.h"
@@ -92,12 +90,12 @@ static _I secID = wmj_null;
 #define SECNUM 2
 enum {
     #define SECNAME_ENUM
-    #include "configDef.h"
+    #include "configbase.h"
     MAX_SECNAME
 };
 static const _c*(SECNAME[MAX_SECNAME]) = {
     #define SECNAME_STRDEF
-    #include "configDef.h"
+    #include "configbase.h"
 };
 #define MNAMESIZE 1024
 static _c m_name[MNAMESIZE];
@@ -136,33 +134,9 @@ static _I set_memberName(_CONFIG *pcfg, _s str, _I len) {
 static _I set_memberInfo(_CONFIG *pcfg, _s str, _I len) {
     _I i, re = 0;
     #define CMP_STRPARAMS
-    #include "configDef.h"
+    #include "configbase.h"
     #define CMP_IPARAMS
-    #include "configDef.h"
-    // if (strcmp("str.name", m_name) == 0) {
-    //     strxcpy(pcfg->str.name, str, MAX_NAME_LEN);
-    //     goto _set_memberInfo_END;
-    // }
-    // if (strcmp("str.bufsize", m_name) == 0) {
-    //     pcfg->str.bufsize = atoi(str);
-    //     goto _set_memberInfo_END;
-    // }
-    // if (strcmp("num.name", m_name) == 0) {
-    //     strxcpy(pcfg->num.name, str, MAX_NAME_LEN);
-    //     goto _set_memberInfo_END;
-    // }
-    // if (strcmp("num.min", m_name) == 0) {
-    //     pcfg->num.min = atoi(str);
-    //     goto _set_memberInfo_END;
-    // }
-    // if (strcmp("num.max", m_name) == 0) {
-    //     pcfg->num.max = atoi(str);
-    //     goto _set_memberInfo_END;
-    // }
-    // if (strcmp("num.def", m_name) == 0) {
-    //     pcfg->num.def = atoi(str);
-    //     goto _set_memberInfo_END;
-    // }
+    #include "configbase.h"
     re = wmj_null;
 _set_memberInfo_END:
     return re;

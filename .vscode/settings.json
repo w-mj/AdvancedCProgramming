@@ -29,7 +29,15 @@
         "ostream": "cpp",
         "type_traits": "cpp",
         "tuple": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "lex.h": "c",
+        "typeinfo": "cpp",
+        "limits": "cpp",
+        "configdef.h": "c",
+        "sstream": "c",
+        "defines.h": "c",
+        "config.h": "c",
+        "types.h": "c"
     }, // 因为有clang的补全，所以关掉
     "editor.glyphMargin": true,
 }
