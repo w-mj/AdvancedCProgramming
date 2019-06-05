@@ -34,5 +34,7 @@
     a = a - b;\
 }while(0)
 
+#define _min(a, b) (a) < (b) ? (a) : (b)
+
 
 #endif

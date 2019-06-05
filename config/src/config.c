@@ -66,10 +66,12 @@ void print_config(_CONFIG *cfg, FILE *f) {
     return;
 }
 
+static _I error_f;
+
 _I load_config(_s infilename, _I is_init, _CONFIG *pCfg, pCFGFUNC pfunc, _p pm) {
     _I re = 0;
     _s str;
-    _I len;
+    _I len, type;
     _c zero = '\0';
 
     _sBUF *p = NULL;
@@ -79,17 +81,20 @@ _I load_config(_s infilename, _I is_init, _CONFIG *pCfg, pCFGFUNC pfunc, _p pm) 
     init_config(ptCfg, is_init, pCfg);
     p = load_file(infilename);
     _error(p == NULL, _load_config_END, "load file error");
+    error_f = 0;
     while(1) {
-        if (analyse_lex(p, &str, &len) == 0) {
+        if ((type = analyse_lex(p, &str, &len)) == wmj_null) {
+            if (error_f)
+                fprintf(stdout, "<%s> have error.\n", infilename);
             break;
         }
         _swap(zero, str[len]);
-        fprintf(stdout, "fount: \"%s\"\n", str);
+        fprintf(stdout, "fount: \"%s\" type %d\n", str, type);
         _swap(zero, str[len]);
     }
     // printf("%s\n", p->buf);
     memcpy(pCfg, ptCfg, sizeof(_CONFIG));
-    re = 0;
+    re = wmj_null;
 _load_config_END:
     free_strbuf(&p);
     return re;
@@ -99,9 +104,16 @@ _load_config_END:
 #include "lex.h"
 static _I analyse_lex(_sBUF *p, _s *str, _I *plen) {
     _I len;
-    _I re = 0;
+    _I re = wmj_null;
+    _c c = 1;
     while (_chkNtail(p)) {
         _trychk(len, re, _LEX_COMMENTS, _analyse_lex_END, _chkComments, p);
+        _trychk(len, re, _LEX_SPLIT, _analyse_lex_END, _chkSplit, p);
+        _trychk(len, re, _LEX_SECEND, _analyse_lex_END, _chkEnd, p);
+        _trychk(len, re, _LEX_SECNAME, _analyse_lex_END, _chkSecName, p);
+        _trychk(len, re, _LEX_SYMBOL, _analyse_lex_END, _chkSymbol, p);
+        _trychk(len, re, _LEX_STR, _analyse_lex_END, _chkStr, p);
+
         p->h += 1;
     }
 

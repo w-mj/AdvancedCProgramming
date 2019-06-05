@@ -23,7 +23,13 @@
         "stdarg.h": "c",
         "paramdef.h": "c",
         "info.h": "c",
-        "delog.h": "c"
+        "delog.h": "c",
+        "array": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "type_traits": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp"
     }, // 因为有clang的补全，所以关掉
     "editor.glyphMargin": true,
 }
