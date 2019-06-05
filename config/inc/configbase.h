@@ -63,13 +63,6 @@
 
 #include "configDef.h"
 
-#ifdef PARAM_IINFO
-PARAM_IINFO(num.min, 0, 100)
-PARAM_IINFO(num.max, 0, 100)
-PARAM_IINFO(num.def, 0, 100)
-PARAM_IINFO(str.bufsize, 0, 80)
-#undef PARAM_IINFO
-#endif
 
 #ifdef SECNAME_ENUM
 #undef SECNAME_ENUM
