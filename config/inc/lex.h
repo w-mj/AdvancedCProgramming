@@ -3,7 +3,6 @@
 #include <ctype.h>
 
 enum {
-    _LEX_NULL,
     _LEX_COMMENTS,
     _LEX_SECNAME,
     _LEX_SECEND,
@@ -96,6 +95,17 @@ enum {
         }\
     }\
 }while(0)
+
+#define _nextLine(p) do {\
+    _I __re;\
+    if (_chkNtail(p) == 0) {\
+        break;\
+    }\
+    _chkchars(p, __re, _cmpNchar, _getchar(p), '\n');\
+    if (_chkNtail(p)) {\
+        p->h += 1;\
+    }\
+} while(0)
 
 #define _trychk(len, re, type, label_END, op, p) do{\
     op(p, len);\

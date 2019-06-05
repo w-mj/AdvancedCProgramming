@@ -65,43 +65,40 @@ void print_config(_CONFIG *cfg, FILE *f) {
     fprintf(f, "test: %d\n", cfg->test);
     return;
 }
+#include "lex.h"
 
 static _I error_f;
 
-_I load_config(_s infilename, _I is_init, _CONFIG *pCfg, pCFGFUNC pfunc, _p pm) {
-    _I re = 0;
-    _s str;
-    _I len, type;
-    _c zero = '\0';
+enum {
+    _WAIT_STATUS,
+    _GETSEC_STATUS,
+    _GETEND_STATUS,
+    _GETSYMBOL_STATUS,
+    _GETSPLIT_STATUS,
+    _GETINFO_STATUS,
+    _FINISH_STATUS,
+    _ERROR_STATUS,
+    _MAX_STATUS
+};
+typedef _I (*pGRAMMERFUNC) (_CONFIG *pCfg, _s str, _I len, _I status);
 
-    _sBUF *p = NULL;
-    _CONFIG ptCfg[1];
-    secfunc = pfunc;
-    sec_pm = pm;
-    init_config(ptCfg, is_init, pCfg);
-    p = load_file(infilename);
-    _error(p == NULL, _load_config_END, "load file error");
-    error_f = 0;
-    while(1) {
-        if ((type = analyse_lex(p, &str, &len)) == wmj_null) {
-            if (error_f)
-                fprintf(stdout, "<%s> have error.\n", infilename);
-            break;
-        }
-        _swap(zero, str[len]);
-        fprintf(stdout, "fount: \"%s\" type %d\n", str, type);
-        _swap(zero, str[len]);
-    }
-    // printf("%s\n", p->buf);
-    memcpy(pCfg, ptCfg, sizeof(_CONFIG));
-    re = wmj_null;
-_load_config_END:
-    free_strbuf(&p);
-    return re;
-}
+static _I grammar_comments(_CONFIG *pCfg, _s str, _I len, _I status) {return _FINISH_STATUS;}
+static _I grammar_split(_CONFIG *pCfg, _s str, _I len, _I status) {return _ERROR_STATUS;}
+static _I grammar_secend(_CONFIG *pCfg, _s str, _I len, _I status) {return _GETEND_STATUS;}
+static _I grammar_secname(_CONFIG *pCfg, _s str, _I len, _I status) {return _GETSEC_STATUS;}
+static _I grammar_symbol(_CONFIG *pCfg, _s str, _I len, _I status) {return _GETINFO_STATUS;}
+static _I grammar_str(_CONFIG *pCfg, _s str, _I len, _I status) {return _ERROR_STATUS;}
+
+static pGRAMMERFUNC grammer_func[_MAX_LEX_MODE] = {
+    grammar_comments, 
+    grammar_secname, 
+    grammar_secend,
+    grammar_symbol,
+    grammar_split,
+    grammar_str
+};
 
 
-#include "lex.h"
 static _I analyse_lex(_sBUF *p, _s *str, _I *plen) {
     _I len;
     _I re = wmj_null;
@@ -122,5 +119,51 @@ _analyse_lex_END:
         *str = (_c*)&(_getchar(p)) - len;
         *plen = len;
     }
+    return re;
+}
+
+
+_I load_config(_s infilename, _I is_init, _CONFIG *pCfg, pCFGFUNC pfunc, _p pm) {
+    _I re = 0;
+    _s str;
+    _I len, type, status;
+    _c zero = '\0';
+
+    _sBUF *p = NULL;
+    _CONFIG ptCfg[1];
+    secfunc = pfunc;
+    sec_pm = pm;
+    init_config(ptCfg, is_init, pCfg);
+    p = load_file(infilename);
+    _error(p == NULL, _load_config_END, "load file error");
+    status = _WAIT_STATUS;
+    error_f = 0;
+    while(1) {
+        if ((type = analyse_lex(p, &str, &len)) == wmj_null) {
+            if (error_f)
+                fprintf(stdout, "<%s> have error.\n", infilename);
+            break;
+        }
+        _swap(zero, str[len]);
+        if ((status = grammer_func[status](ptCfg, str, len, status)) == _ERROR_STATUS) {
+            fprintf(stdout, "<%s> have error.\n", infilename);
+            break;
+        }
+        fprintf(stdout, "fount: \"%s\" type %d\n", str, type);
+        _swap(zero, str[len]);
+        switch (status) {
+            case _FINISH_STATUS:
+            case _GETINFO_STATUS:
+            case _GETSEC_STATUS:
+            case _GETEND_STATUS:
+                _nextLine(p);
+                status = _WAIT_STATUS;
+        }
+    }
+    // printf("%s\n", p->buf);
+    memcpy(pCfg, ptCfg, sizeof(_CONFIG));
+    re = wmj_null;
+_load_config_END:
+    free_strbuf(&p);
     return re;
 }
