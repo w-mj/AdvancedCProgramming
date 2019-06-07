@@ -1,0 +1,8 @@
+obj/string.o: src/string/string.c inc/string/string.h inc/types.h
+obj/config.o: src/config/config.c inc/string/string.h inc/types.h \
+ inc/config/config.h inc/defines.h inc/types.h inc/config/configbase.h \
+ inc/config/configDef.h inc/delog/delog.h inc/info.h \
+ inc/config/configbase.h inc/config/lex.h
+obj/delog.o: src/delog/delog.c inc/delog/delog.h inc/types.h inc/info.h
+obj/test_config.o: src/config/test_config.c inc/types.h inc/config/config.h \
+ inc/defines.h inc/types.h inc/config/configbase.h inc/config/configDef.h

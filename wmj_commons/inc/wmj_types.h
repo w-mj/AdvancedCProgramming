@@ -14,7 +14,7 @@ typedef unsigned long long _u64;
 typedef _u32 _I;
 typedef _u8 _c;
 typedef _c* _s;
-typedef _u8* _p;
+typedef void* _p;
 
 #define _getva_T_(P, params, _T_) do {P = (_T_)va_arg(params, _T_); }while(0)
 #define _getva_S(s, params) _getva_T_(s, params, _s)
@@ -22,8 +22,6 @@ typedef _u8* _p;
 #define _getva_P(s, params) _getva_T_(s, params, _p)
 #define _getva_double(s, params) _getva_T_(s, params, double)
 #define _getva_I32(s, params) _getva_T_(s, params, _i32)
-
-
 
 #define _BITS_SIZE(n) (1 << (n))
 #define _BITS_MASK(n) (_BITS_SIZE(n) - 1)
@@ -40,5 +38,8 @@ typedef _u8* _p;
 #define _LNclr(a, n) ((a & (_BITS_MASK(n))))
 
 #define _Inext(pI, i) ((pI) + (i))->_next
+
+#define nullptr NULL
+#define null NULL
 
 #endif

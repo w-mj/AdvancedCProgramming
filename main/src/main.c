@@ -1,4 +1,5 @@
-#include "wmj_info.h"
+#include "info.h"
+#include "string.h"
 
 int main(int argc, char **argv) {
     __info("This is Main func %d", 1);

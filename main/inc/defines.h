@@ -37,7 +37,4 @@
 #define _min(a, b) (a) < (b) ? (a) : (b)
 #define _max(a, b) (a) > (b) ? (a) : (b)
 
-_I strxcpy(_s dst, _s src, _I n);
-
-
 #endif

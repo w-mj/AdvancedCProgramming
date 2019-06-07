@@ -37,7 +37,9 @@
         "sstream": "c",
         "defines.h": "c",
         "config.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "string.h": "c",
+        "configbase.h": "c"
     }, // 因为有clang的补全，所以关掉
     "editor.glyphMargin": true,
 }

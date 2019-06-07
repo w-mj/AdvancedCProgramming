@@ -4,8 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include "wmj_delog.h"
-#include "wmj_defines.h"
+#include "delog/delog.h"
 
 static _I get_current_date(_s buf, _I size) {
     time_t now;
@@ -221,7 +220,7 @@ _print_debug_END:
     return ;
 }
 
-void _wmj_delog(_I type, ...) {
+void _delog(_I type, ...) {
     va_list params;
     va_start(params, type);
 
@@ -230,7 +229,7 @@ void _wmj_delog(_I type, ...) {
         _getva_S(dbgname, params);
         _getva_S(logname, params);
         _init_delog(params, dbgname, logname);
-        goto _wmj_delog_END;
+        goto _delog_END;
     }
     _init_delog(params, 0, 0);
 
@@ -248,7 +247,7 @@ void _wmj_delog(_I type, ...) {
             break;
     }
 
-_wmj_delog_END:
+_delog_END:
     va_end(params);
     out_info(type);
     // printf("test only: %s\n", ms_buf);

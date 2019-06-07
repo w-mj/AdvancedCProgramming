@@ -1,0 +1,5 @@
+obj/wmj_delog.o: src/wmj_delog.c inc/wmj_delog.h \
+ ../wmj_commons/inc/wmj_types.h ../wmj_commons/inc/wmj_info.h \
+ ../wmj_commons/inc/wmj_defines.h ../wmj_commons/inc/wmj_types.h
+obj/test_wmj_delog.o: src/test_wmj_delog.c ../wmj_commons/inc/wmj_types.h \
+ inc/wmj_delog.h ../wmj_commons/inc/wmj_info.h

@@ -2,8 +2,9 @@ SRC_PATH=src
 OBJ_PATH=obj
 BIN_PATH=bin
 LIB_PATH=bin
-SRC_NAME = string/string config/config delog/delog
-MAIN_NAME = config/test_config
+MODULE_NAME = my_config
+SRC_NAME = defines config
+MAIN_NAME = test_config_main
 SRC_FILE= $(addsuffix .c, $(addprefix $(SRC_PATH)/, $(SRC_NAME)))
 OBJ_FILE= $(addsuffix .o, $(addprefix $(OBJ_PATH)/, $(SRC_NAME)))
 MAIN_FILE= $(addsuffix .c, $(addprefix $(SRC_PATH)/, $(MAIN_NAME)))
@@ -14,7 +15,7 @@ BIN_FILE = $(addprefix $(BIN_PATH)/, $(MAIN_NAME))
 CLEAN_OBJ =$(OBJ_FILE) $(BIN_FILE) $(LIB_FILE) .depend
 build: .depend $(BIN_FILE)
 
-$(BIN_FILE): $(OBJ_FILE) $(MAIN_FILE)
+$(BIN_FILE): $(OBJ_FILE) $(MAIN_FILE) ../wmj_delog/obj/wmj_delog.o
 	gcc $^ -o $@ -Iinc
 
 .depend: $(SRC_FILE) $(MAIN_FILE)
@@ -24,7 +25,7 @@ $(BIN_FILE): $(OBJ_FILE) $(MAIN_FILE)
 sinclude .depend
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c $(MAKEFILE_LIST)
-	gcc -c $< -Iinc -Iinc/% -DDEBUG -o $@
+	gcc -c $< -Iinc -DDEBUG -o $@
 
 rebuild: clean build
 
