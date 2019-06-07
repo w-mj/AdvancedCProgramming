@@ -2,8 +2,8 @@
 #define _CONFIG_H_
 
 #include <stdio.h>
-#include "types.h"
-#include "defines.h"
+#include "wmj_types.h"
+#include "wmj_defines.h"
 
 #define PARAM_SECDEF
 #include "configbase.h"

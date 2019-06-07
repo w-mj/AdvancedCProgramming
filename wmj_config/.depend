@@ -1,6 +1,8 @@
-obj/defines.o: src/defines.c inc/defines.h inc/types.h
-obj/config.o: src/config.c inc/config.h inc/types.h inc/defines.h \
- inc/configbase.h inc/configDef.h inc/defines.h inc/types.h inc/delog.h \
- inc/info.h inc/configbase.h inc/lex.h
-obj/test_config_main.o: src/test_config_main.c inc/types.h inc/config.h \
- inc/types.h inc/defines.h inc/configbase.h inc/configDef.h inc/defines.h
+obj/wmj_config.o: src/wmj_config.c inc/wmj_config.h \
+ ../wmj_commons/inc/wmj_types.h ../wmj_commons/inc/wmj_defines.h \
+ ../wmj_commons/inc/wmj_types.h inc/configbase.h inc/configDef.h \
+ ../wmj_commons/inc/wmj_delog.h ../wmj_commons/inc/wmj_info.h \
+ ../wmj_commons/inc/wmj_string.h inc/configbase.h inc/lex.h
+obj/test_wmj_config.o: src/test_wmj_config.c ../wmj_commons/inc/wmj_types.h \
+ inc/wmj_config.h ../wmj_commons/inc/wmj_defines.h \
+ ../wmj_commons/inc/wmj_types.h inc/configbase.h inc/configDef.h

@@ -1,6 +1,6 @@
-#include "types.h"
-#include "config.h"
-#include "defines.h"
+#include "wmj_types.h"
+#include "wmj_config.h"
+#include "wmj_defines.h"
 
 _i32 main(_i32 argc, _s argv[]) {
     _i32 re = 1;

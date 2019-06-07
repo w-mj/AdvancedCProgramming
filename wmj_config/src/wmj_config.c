@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
-#include "config.h"
-#include "defines.h"
-#include "types.h"
-#include "delog.h"
+#include "wmj_config.h"
+#include "wmj_defines.h"
+#include "wmj_types.h"
+#include "wmj_delog.h"
+#include "wmj_string.h"
 
 typedef struct {
     _I h;  // current cursor
