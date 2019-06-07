@@ -39,7 +39,8 @@
         "config.h": "c",
         "types.h": "c",
         "string.h": "c",
-        "configbase.h": "c"
+        "configbase.h": "c",
+        "wmj_string.h": "c"
     }, // 因为有clang的补全，所以关掉
     "editor.glyphMargin": true,
 }
