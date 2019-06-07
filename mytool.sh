@@ -15,13 +15,8 @@ create_dir() {
         echo create dir $1.
         return 0
     else
-        if [ -d $1 ]; then
-            echo $1 is already exists.
-            return 1
-        else 
-            echo "could not create directory "/$1
-            exit
-        fi
+        echo "could not create directory "/$1
+        exit
     fi
 }
 
@@ -50,8 +45,8 @@ create_test_file() {
     text=$text"    // 在此处加入测试代码\n"
     text=$text"    return 0;\n"
     text=$text"}\n"
-    echo -e "$text" > "test_"$1".c"
-    echo create test file.
+    echo -e "$text" > "src/test_"$1".c"
+    echo create src/test_$1.c
 }
 
 create_source() {
@@ -65,6 +60,7 @@ create_source() {
     text=$text" **/\n\n\n\n\n\n\n\n"
     text=$text"#endif"
     echo -e "$text" > inc/$1.h
+    echo create inc/$1.h
     
     text="/**\n"
     text=$text" * File: "$1".c\n"
@@ -74,22 +70,36 @@ create_source() {
     text=$text" **/\n"
     text=$text"#include \""$1".h\""
     echo -e "$text" > src/$1.c
+    echo create src/$1.c
+}
+
+create_makefile() {
+    text="\n"
+    text=$text"MODULE_NAME="$1"\n"
+    text=$text"SRC_NAME="$1"\n"
+    text=$text"MAIN_NAME=test_"$1"\n"
+    echo -e "$text" > $1/Makefile
+    cat Makefile.template >> $1/Makefile
+    echo create Makefile
 }
 
 create_module() {
+    if [ -d $1 ]; then
+        echo $1 is already exists.
+        exit
+    fi
     create_dir $1
     cd $1
     create_dir $SRC_PATH
-    cd src
-    create_test_file $1
-    cd ..
     create_dir $INC_PATH
     create_dir $OBJ_PATH
     create_dir $BIN_PATH
     create_dir $INPUT_PATH
     create_dir $OUT_PATH
+    create_test_file $1
     create_source $1
     cd ..
+    create_makefile $1
 }
 
 if [ $# -eq "0" ]; then
@@ -102,5 +112,13 @@ if [ $1 = "submodule" ]; then
         exit
     fi
     create_module $2
+    exit
+fi
+if [ $1 = "source" ]; then
+    if [ $# -lt 2 ]; then
+        echo "no source name"
+        exit
+    fi
+    create_source $2
     exit
 fi
