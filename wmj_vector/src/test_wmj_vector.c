@@ -11,7 +11,13 @@
 #include "wmj_delog.h"
 
 #include "wmj_vector.h"
+
+
 defineVector(int);
+
+void print_one(int c) {
+    printf("%d,", c);
+}
 
 int main(int argc, char* argv[]) {
     Vector(int) vv = CreateVector(int);
@@ -22,10 +28,34 @@ int main(int argc, char* argv[]) {
     vec_push_back(vv, 4);
     vec_push_back(vv, 3);
     
-    _si(vec_index(vv, 0));
-    _si(vec_index(vv, 1));
-    _si(vec_index(vv, 3));
-    _si(vec_index(vv, 2));
+    vec_foreach(vv, print_one);
+    putchar('\n');
+
+    vec_push_back(vv, 3);
+    vec_push_back(vv, 5);
+    vec_push_back(vv, 9);
+
+    vec_foreach(vv, print_one);
+    putchar('\n');
+
+    vec_pop_back(vv);
+    vec_foreach(vv, print_one);
+    putchar('\n');
+
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+    vec_pop_back(vv);
+
+    vec_foreach(vv, print_one);
+    putchar('\n');
 
     //_vec_print_inner(vv);
 

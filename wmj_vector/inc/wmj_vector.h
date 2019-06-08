@@ -89,9 +89,21 @@ _WMJ_VECTOR_P_STRUCT___##T vec_##T##_create() {\
 #define vec_pop_back(vec) do {\
     if (vec->_end_index > vec->_start_index) {\
         vec->_end_index--;\
-        vec->_ele_num--;\
     }\
 }while (0)
+
+#define vec_size(vec) (vec->_end_index - vec->_start_index)
+#define vec_begin(vec) (vec->_data + vec->_start_index)
+#define vec_end(vec) (vec->_data + vec->_end_index)
+
+#define vec_foreach(vec, func) do {\
+    _I __i__ = vec->_start_index;\
+    while (__i__ != vec->_end_index) {\
+        func(vec_at(vec, __i__));\
+        __i__++;\
+    }\
+}while (0)
+
 
 #define _vec_print_inner(vec) do {\
     printf("ele_size: %d\n", vec->_ele_size);\
