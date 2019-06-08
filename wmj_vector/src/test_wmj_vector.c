@@ -17,15 +17,10 @@ int main(int argc, char* argv[]) {
     Vector(int) vv = CreateVector(int);
     // puts("create vector");
 
-    //_vec_print_inner(vv);
     vec_push_back(vv, 1);
-    //_vec_print_inner(vv);
     vec_push_back(vv, 2);
-    //_vec_print_inner(vv);
     vec_push_back(vv, 4);
-   // _vec_print_inner(vv);
     vec_push_back(vv, 3);
-   // _vec_print_inner(vv);
     
     _si(vec_index(vv, 0));
     _si(vec_index(vv, 1));

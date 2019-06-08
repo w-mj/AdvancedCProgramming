@@ -54,6 +54,8 @@ _WMJ_VECTOR_P_STRUCT___##T vec_##T##_create() {\
     vec->_data[i]\
 )
 
+#define vec_at(vec, i) vec_index(vec, i)
+
 #define vec_trim(vec) do {\
     if (vec->_start_index == 0) break;\
     _I __gap = vec->_start_index;\
@@ -83,6 +85,13 @@ _WMJ_VECTOR_P_STRUCT___##T vec_##T##_create() {\
     vec->_data[vec->_end_index] = i;\
     vec->_end_index+=1;\
 } while (0)
+
+#define vec_pop_back(vec) do {\
+    if (vec->_end_index > vec->_start_index) {\
+        vec->_end_index--;\
+        vec->_ele_num--;\
+    }\
+}while (0)
 
 #define _vec_print_inner(vec) do {\
     printf("ele_size: %d\n", vec->_ele_size);\
