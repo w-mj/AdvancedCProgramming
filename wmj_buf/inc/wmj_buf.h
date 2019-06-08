@@ -6,11 +6,15 @@
  * Author: wmj
  * Comment: 
  **/
+#include "wmj_types.h"
 
+typedef struct {
+    _I size;
+    _u8 pd[];
+}_BUFX;
 
+typedef _BUFX *_PX;
 
-
-
-
+_PX _alloc(_I size);
 
 #endif
