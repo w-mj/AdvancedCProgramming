@@ -48,7 +48,11 @@
         "cmath": "c",
         "complex": "c",
         "time.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "wmj_vector.h": "c",
+        "wmj_vector_base.h": "c",
+        "initializer_list": "c",
+        "string_view": "c"
     }, // 因为有clang的补全，所以关掉
     "editor.glyphMargin": true,
 }

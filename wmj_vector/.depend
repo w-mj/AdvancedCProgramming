@@ -1,0 +1,7 @@
+obj/wmj_vector.o: src/wmj_vector.c inc/wmj_vector.h \
+ ../wmj_commons/inc/wmj_types.h ../wmj_commons/inc/wmj_delog.h \
+ ../wmj_commons/inc/wmj_types.h ../wmj_commons/inc/wmj_info.h
+obj/test_wmj_vector.o: src/test_wmj_vector.c ../wmj_commons/inc/wmj_types.h \
+ ../wmj_commons/inc/wmj_defines.h ../wmj_commons/inc/wmj_types.h \
+ ../wmj_commons/inc/wmj_delog.h ../wmj_commons/inc/wmj_info.h \
+ inc/wmj_vector.h
