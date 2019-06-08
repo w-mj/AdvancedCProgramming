@@ -47,7 +47,8 @@
         "assert.h": "c",
         "cmath": "c",
         "complex": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "stat.h": "c"
     }, // 因为有clang的补全，所以关掉
     "editor.glyphMargin": true,
 }
