@@ -5,6 +5,8 @@
 #include "wmj_types.h"
 #include "wmj_delog.h"
 #include "wmj_string.h"
+#include "lex.h"
+
 
 typedef struct {
     _I h;  // current cursor
@@ -19,7 +21,7 @@ static _I analyse_lex(_sBUF *p, _s *str, _I *plen);
 static _sBUF *create_strbuf(_I num) {
     _sBUF *pre = NULL;
     pre = malloc(num + 1 + sizeof(_sBUF));
-    _error(pre == 0, _create_strbuf_END, "malloc fail");
+    _error_gs(pre == 0, _create_strbuf_END, "malloc fail");
     pre->h = 0;
     pre->t = 0;
 _create_strbuf_END:
@@ -69,7 +71,6 @@ void print_config(_CONFIG *cfg, FILE *f) {
     #include "configbase.h"
     return;
 }
-#include "lex.h"
 
 static _I error_f;
 
@@ -270,7 +271,7 @@ _I load_config(_s infilename, _I is_init, _CONFIG *pcfg, pCFGFUNC pfunc, _p pm) 
     sec_pm = pm;
     init_config(ptCfg, is_init, pcfg);
     p = load_file(infilename);
-    _error(p == NULL, _load_config_END, "load file error");
+    _error_gs(p == NULL, _load_config_END, "load file error");
     status = _WAIT_STATUS;
     error_f = 0;
     while(1) {

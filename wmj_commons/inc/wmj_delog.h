@@ -65,10 +65,38 @@ enum {
 #define _pos() _debug_info("", "n", "")
 
 #include <stdlib.h>
-#define _error(exp, escape_label, ...) do {\
+#define _error_gs(exp, escape_label, ...) do {\
     if (exp) {\
         _debug_info(mkstr(exp), "e", __VA_ARGS__);\
         goto escape_label;\
+    }\
+} while(0)
+
+#define _error_g(exp, escape_label) do {\
+    if (exp) {\
+        _debug_info(mkstr(exp), "e", "An error occurs!");\
+        goto escape_label;\
+    }\
+} while(0)
+
+#define _error_s(exp, ...) do {\
+    if (exp) {\
+        _debug_info(mkstr(exp), "e", __VA_ARGS__);\
+        exit(1);\
+    }\
+} while(0)
+
+#define _error(exp) do {\
+    if (exp) {\
+        _debug_info(mkstr(exp), "e", "An error occurs!");\
+        exit(1);\
+    }\
+} while(0)
+
+#define _assert(exp) do {\
+    if (!(exp)) {\
+        _debug_info(mkstr(exp), "e", "Assert fail!");\
+        exit(1);\
     }\
 } while(0)
 

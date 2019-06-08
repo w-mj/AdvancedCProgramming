@@ -40,7 +40,14 @@
         "types.h": "c",
         "string.h": "c",
         "configbase.h": "c",
-        "wmj_string.h": "c"
+        "wmj_string.h": "c",
+        "wmj_config.h": "c",
+        "wmj_defines.h": "c",
+        "wmj_buf.h": "c",
+        "assert.h": "c",
+        "cmath": "c",
+        "complex": "c",
+        "time.h": "c"
     }, // 因为有clang的补全，所以关掉
     "editor.glyphMargin": true,
 }

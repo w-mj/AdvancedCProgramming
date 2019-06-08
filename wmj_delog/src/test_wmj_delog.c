@@ -2,7 +2,7 @@
 #include "wmj_delog.h"
 
 _i32 main(_i32 argc, _s argv[]) {
-    _error(argc < 2, _main_END, "%s need 2 params!", argv[0]);
+    _error_gs(argc < 2, _main_END, "%s need 2 params!", argv[0]);
     _bug(argc < 3);
     _si(argc);
     _sp(argc);

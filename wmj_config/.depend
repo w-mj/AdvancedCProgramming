@@ -2,7 +2,7 @@ obj/wmj_config.o: src/wmj_config.c inc/wmj_config.h \
  ../wmj_commons/inc/wmj_types.h ../wmj_commons/inc/wmj_defines.h \
  ../wmj_commons/inc/wmj_types.h inc/configbase.h inc/configDef.h \
  ../wmj_commons/inc/wmj_delog.h ../wmj_commons/inc/wmj_info.h \
- ../wmj_commons/inc/wmj_string.h inc/configbase.h inc/lex.h
+ ../wmj_commons/inc/wmj_string.h inc/lex.h inc/configbase.h
 obj/test_wmj_config.o: src/test_wmj_config.c ../wmj_commons/inc/wmj_types.h \
  inc/wmj_config.h ../wmj_commons/inc/wmj_defines.h \
  ../wmj_commons/inc/wmj_types.h inc/configbase.h inc/configDef.h

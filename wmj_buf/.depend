@@ -1,0 +1,5 @@
+obj/wmj_buf.o: src/wmj_buf.c inc/wmj_buf.h
+obj/test_wmj_buf.o: src/test_wmj_buf.c inc/wmj_buf.h \
+ ../wmj_commons/inc/wmj_types.h ../wmj_commons/inc/wmj_defines.h \
+ ../wmj_commons/inc/wmj_types.h ../wmj_commons/inc/wmj_delog.h \
+ ../wmj_commons/inc/wmj_info.h
